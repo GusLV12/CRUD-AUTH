@@ -18,18 +18,18 @@ export const register = async (req, res) => {
     });
 
     // Se guarda el usuario en la base de datos
-    const userSaved = await newUser.save();
+    const userFound = await newUser.save();
 
-    const token = await createAccessToken({ id: userSaved._id })
+    const token = await createAccessToken({ id: userFound._id })
     res.cookie("token", token)
 
     // Se devuelve la información del usuario registrado
     res.json({
-      id: userSaved._id,
-      username: userSaved.username,
-      email: userSaved.email,
-      createdAt: userSaved.createdAt,
-      updatedAt: userSaved.updatedAt,
+      id: userFound._id,
+      username: userFound.username,
+      email: userFound.email,
+      createdAt: userFound.createdAt,
+      updatedAt: userFound.updatedAt,
     });
   } catch (error) {
     // En caso de error, se maneja aquí
@@ -38,6 +38,41 @@ export const register = async (req, res) => {
 };
 
 // Función para el inicio de sesión 
-export const login = (req, res) => {
-  res.send('login');
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+
+    const userFound = await User.findOne({email})
+
+    if(!userFound) return res.status(400).json({message: "user not found"})
+    // Se encripta la contraseña
+    const isMatch = await bcrypt.compare(password, userFound.password);
+
+    if(!isMatch) return res.status(404).json({message: "Incorrect credential"})
+    // Se crea un nuevo usuario con los datos proporcionados
+   
+    const token = await createAccessToken({ id: userFound._id })
+    res.cookie("token", token)
+
+    // Se devuelve la información del usuario registrado
+    res.json({
+      id: userFound._id,
+      username: userFound.username,
+      email: userFound.email,
+      createdAt: userFound.createdAt,
+      updatedAt: userFound.updatedAt,
+    });
+  } catch (error) {
+    // En caso de error, se maneja aquí
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
 };
+
+export const logout = async (req, res) => {
+  res.cookie('token',"", {
+    expires: new Date(0)
+  })
+
+  return res.sendStatus(200);
+}
