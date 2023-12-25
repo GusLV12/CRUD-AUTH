@@ -1,7 +1,7 @@
-import User from '../models/user.model'
+import User from '../models/user.model.js'
 
 export const register = async (req, res) => {
-  const {username, email, password} = req.body
+  const { email, password, username } = req.body
 
   try {
     const newUser = new User({
@@ -9,9 +9,10 @@ export const register = async (req, res) => {
       email,
       password
     })
-  
-    await newUser.save()
-    
+
+    const userSaved = await newUser.save()
+    res.json(userSaved)
+
   } catch (error) {
     console.log(error)
   }

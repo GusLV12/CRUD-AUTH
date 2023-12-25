@@ -5,6 +5,6 @@ export const connectDB = async () => {
     await mongoose.connect("mongodb://localhost/merndb")
     console.log("Connected")
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
