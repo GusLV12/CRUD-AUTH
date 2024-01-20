@@ -6,7 +6,7 @@ export function createAccessToken(payload) {
   return new Promise((resolve, reject) => {
     jwt.sign(
       payload,
-      'claveSegura', // Reemplaza 'claveSegura' con tu clave secreta real
+      TOKEN_SECRET, // Reemplaza 'claveSegura' con tu clave secreta real
       { expiresIn: '1d' }, // Puedes ajustar el tiempo de expiración según tus necesidades
       (err, token) => {
         if (err) reject(err);
